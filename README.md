@@ -29,6 +29,7 @@ el envío.
 generar los gráficos que se solicitan en la parte 1 y 2. (10% Extra)
 
 ## El dispositivo a analizar (DUT):
+
 Consta de un controlador de bus paralelo con la siguiente definicion:
 ```Verilog
 bs_gnrtr_n_rbtr 
@@ -47,6 +48,9 @@ bs_gnrtr_n_rbtr
   output [pckg_sz-1:0] D_push[bits-1:0][drvrs-1:0]
 );
 ```
+Conectado de la siguiente manera:
+![alt text](https://github.com/Pablopabota/Proyecto1_Verificacion/blob/main/Esquema_bus_paralelo.jpg?raw=true)
+
 
 ## Testplan
 ### Casos de uso comun:
@@ -61,8 +65,42 @@ Se aleatorizaran:
 
 ### Casos de esquina:
 * Dos (o mas) dispositivos envian datos a la vez.
+* Que se reciba y se envie un mensaje a travez del mismo terminal.
 * Un dispositivo desea enviar un mensaje muy largo.
 * Se aplicara un reset en medio de una transmision.
 
 ### Estructura del ambiente
 ![alt text](https://github.com/Pablopabota/Proyecto1_Verificacion/blob/main/Estructura_del_ambiente.jpg?raw=true)
+
+A continuacion se desarrolla que funcion debe cumplir cada parte del ambiente:
+
+#### Test
+Indicara al generador el tipo de prueba que se llevara a cabo. Debera especificar:
+* La cantidad de dispositivos conectados (terminales).
+* Los distintos tamaños de las FIFOs de los terminales.
+* Los dispositivos que se comunicaran y sus destinatarios.
+
+#### Generador (Generator) y Agente (Agent)
+En este caso se implementara el generador y el agente bajo un mismo modulo con el fin de simplificar el diagrama del entorno de pruebas. El mismo debera:
+* Generar los mensajes a enviar.
+* Especificar el tiempo entre mensajes.
+
+Las caracteristicas mencionadas previamentes seran recolectadas en el Scoreboard para luego ser contrastadas en el checker.
+
+#### Driver y Monitor
+El driver y el monitor deberan implementar las FIFOs de las distintas terminales conectadas al los controladores del bus. Estos deberan:
+* Enviar los datos por la interfaz/terminal que corresponda.
+* Leer los datos de las interfaces que hayan recibido mensajes y reportarlos al checker.
+* Reportar el tiempo entre mensajes.
+
+#### Scoreboard
+Se encargara de recoger los datos de las transacciones a realizar y enviarlas al checker para verificar el funcionamiento.
+
+#### Checker
+Debera contrastar los datos enviados con los recibidos y que estos sean correctos.
+En caso de direccion de "broadcast" todos los dispositivos deberan haber recibido el mismo mensaje.
+
+#### Aserciones (Assertions)
+Se utilizara para verificar el correcto funcionamiento de los controladores. Debe:
+* Verificar que si el bus esta ocupado, alguno de los flags de busy esta levantado.
+* Que el dispositivo enviando datos sea el que tiene el flag del trn_chang levantado.
