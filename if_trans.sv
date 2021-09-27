@@ -14,7 +14,7 @@ class trans_ctrl #(parameter width = 16);
     rand tipo_trans tipo;
     int max_delay;
 
-    constraint const_delay { delay < max_delay; delay > 0;}
+    constraint const_delay { delay < max_delay; delay > 0; }
 
     function new(
             // Valores por defecto
@@ -53,7 +53,27 @@ class trans_ctrl #(parameter width = 16);
 
 endclass //trans_ctrl
 
+///////////////////////////////////////////////////////////////////////
+// Interface: Esta es la interface que se conecta con el controlador //
+///////////////////////////////////////////////////////////////////////
+
+interface ctrl_if #(
+    parameter bits = 1,
+    parameter drvrs = 4, 
+    parameter pckg_sz = 16
+) (
+    input clk
+);
+    logic               reset,
+    logic               pndng   [bits-1:0][drvrs-1:0],
+    logic               push    [bits-1:0][drvrs-1:0],
+    logic               pop     [bits-1:0][drvrs-1:0],
+    logic [pckg_sz-1:0] D_pop   [bits-1:0][drvrs-1:0],
+    logic [pckg_sz-1:0] D_push  [bits-1:0][drvrs-1:0]
+
+endinterface
+
 ///////////////////////////////////////
-//  Defino el mailbox 
+//  Defino el mailbox                //
 ///////////////////////////////////////
 typedef mailbox #(trans_ctrl) trans_ctrl_mbx;

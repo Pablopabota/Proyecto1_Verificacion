@@ -18,26 +18,31 @@ module test_bench;
     // Instancio el test: este modulo va a dar inicio a los demas
 
     // Instancio la interfaz que interconecta el controlador con las FIFO
+    ctrl_if #(
+        .bits(bits),
+        .drvrs(drvrs),
+        .pckg_sz(pckg_sz)
+    ) 
+    _if ( .clk(clk) );
 
     always #5 clk = ~clk;   // Sincronizmo
 
     // Instancio el modulo a testear
-    bs_gnrtr_n_rbtr 
-    #( 
+    bs_gnrtr_n_rbtr #( 
         // .broadcast() // Mantengo la misma direccion de Broadcast
-        .bits(),
-        .drvrs(), 
-        .pckg_sz()
+        .bits(bits),
+        .drvrs(drvrs), 
+        .pckg_sz(pckg_sz)
     )
     dut
-    (
-        .clk(),
-        .reset(),
-        .pndng(),
-        .push(),
-        .pop(),
-        .D_pop(),
-        .D_push()
+    (   // Conecto los terminales a la interfaz, conectando el DUT con el ambiente
+        .clk(_if.clk),
+        .reset(_if.reset),
+        .pndng(_if.pndng),
+        .push(_if.push),
+        .pop(_if.pop),
+        .D_pop(_if.D_pop),
+        .D_push(_if.D_push)
     );
 
     initial begin
